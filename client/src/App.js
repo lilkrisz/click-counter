@@ -1,26 +1,50 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from "react";
+import "./App.css";
+import axios from "./axios.js";
 
-function App() {
+const App = () => {
+  const [counterValue, setCounterValue] = useState(undefined);
+
+  useEffect(() => {
+    axios
+      .get("/counterValue")
+      .then((res) => {
+        setCounterValue(res.data.counterValue);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
+
+  const saveInDatabase = () => {
+    axios
+      .put("/updateCounterValue", { counterValue })
+      .then((res) => {})
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="app">
+      {counterValue !== undefined && (
+        <div>
+          <button
+            className="app__button"
+            onClick={(e) => setCounterValue(counterValue + 1)}
+          >
+            {counterValue}
+          </button>
+          <button className="app__button" onClick={() => setCounterValue(0)}>
+            Reset
+          </button>
+          <button className="app__button" onClick={saveInDatabase}>
+            Save
+          </button>
+        </div>
+      )}
     </div>
   );
-}
+};
 
 export default App;
