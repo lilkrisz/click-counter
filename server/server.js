@@ -29,6 +29,28 @@ app.get("/api/counterValue", (req, res) => {
   });
 });
 
+app.put("/api/updateCounterValue", (req, res) => {
+  const { counterValue } = req.body;
+  if (typeof counterValue !== "number") {
+    res.status(400).json({ error: "Format of the value is not correct" });
+    return;
+  }
+
+  db.serialize(() => {
+    db.run(`UPDATE counter SET value = ${counterValue}`, (err) => {
+      if (err) {
+        console.log(err);
+        res
+          .status(500)
+          .json({ error: "Something went wrong, please try again later" });
+        return;
+      }
+      res.status(200).json({ counterValue });
+      return;
+    });
+  });
+});
+
 app.listen(port, () => {
   db.serialize(() => {
     db.run("DROP TABLE IF EXISTS counter");
